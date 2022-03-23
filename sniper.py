@@ -30,15 +30,20 @@ def check_usernames():
     while True:
         url = "https://users.roblox.com/v1/usernames/users"
         names = gen_dict()
+        #print(names)
         data = requests.post(url, names).json()
         try:
             for i in data["data"]:
-                if i["name"] in names["usernames"]:
-                    pass
-                
-                else:
-                    print(i["name"] + " not taken")
-                    
+                foundName = i["requestedUsername"].lower()
+                for x in names["usernames"]:
+                    if x.lower() == foundName:
+                        try:
+                            names["usernames"].remove(i["requestedUsername"])
+                            
+                        except:
+                            print("not found user error")
+            for user in names["usernames"]:
+                print(f"user unclaimed {user}")                    
         except:
             print("ratelimited")
             time.sleep(31)
