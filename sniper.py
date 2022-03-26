@@ -1,57 +1,41 @@
 import random
-import string
 import requests
 import json
 import threading
-import time
+import itertools
+import string
 
+def check_username(username):
+    data = requests.get(f"https://api.roblox.com/users/get-by-username?username={username}").json()
+    try:
+        data["errorMessage"]
+        print(f"{username} is not taken")
+        with open("usernames.txt", "a") as myfile:
+            myfile.write(username + "\n")
+    except:
+        print(f"{username} is taken")
+        with open("taken.txt", "a") as myfile:
+            myfile.write(username + "\n")
 
+def pick_username():
+    return ''.join(random.SystemRandom().choice(string.ascii_lowercase + string.digits) for _ in range(5))
 
-def gen_name():
-    letters = string.ascii_lowercase
-    return ''.join(random.choice(letters) for i in range(5))
-
-
-def gen_dict():
-    userDict = {
-        "usernames": [],
-        "excludeBannedUsers": False
-    }
-    
-    
-    for i in range(100):
-        userDict["usernames"].append(gen_name())
         
-    return userDict
-        
-        
-
-def check_usernames():
+def program():
     while True:
-        url = "https://users.roblox.com/v1/usernames/users"
-        names = gen_dict()
-        #print(names)
-        data = requests.post(url, names).json()
-        try:
-            for i in data["data"]:
-                foundName = i["requestedUsername"].lower()
-                for x in names["usernames"]:
-                    if x.lower() == foundName:
-                        try:
-                            names["usernames"].remove(i["requestedUsername"])
-                            
-                        except:
-                            print("not found user error")
-            for user in names["usernames"]:
-                print(f"user unclaimed {user}")                    
-        except:
-            print("ratelimited")
-            time.sleep(31)
+        check_username(pick_username())
 
 def main():
-    for i in range(1):
-        threading.Thread(target=check_usernames).start()
-    
+    for i in range(750):
+        threading.Thread(target=program).start()
+
 main()
+
     
+    
+    
+
+
+        
+
 
